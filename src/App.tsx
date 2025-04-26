@@ -5,9 +5,9 @@ import RegisterPage from './pages/register'
 import Dashboard from './pages/dashboard'
 import KanbanPage from './pages/kanbanboard';
 
-import { AuthProvider, useAuth } from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/authContext'
 
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user } = useAuth()
   return user ? children : <Navigate to="/login" />
 }

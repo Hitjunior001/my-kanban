@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { auth, db } from '../firebase/config'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
-import { addDoc, collection, setDoc, doc } from 'firebase/firestore'
+import {setDoc, doc } from 'firebase/firestore'
 import { Link, useNavigate } from 'react-router-dom'
 
 export default function RegisterPage() {
@@ -18,6 +18,9 @@ export default function RegisterPage() {
       if (!username.trim()) {
         throw new Error('Por favor, forneça um nome de usuário')
       }
+      if(confirmPassword != password){
+        console.log("Senhas diferentes")
+      }
   
       const userCredential = await createUserWithEmailAndPassword(auth, email, password)
       const user = userCredential.user
@@ -31,11 +34,17 @@ export default function RegisterPage() {
       })
     
       navigate('/dashboard')
-    } catch (err) {
-      setError(err.message)
-      console.error("Erro ao registrar usuário:", err)
-    }
+    } catch (err: unknown) {
+        if (typeof err === "object" && err !== null && "message" in err) {
+          const error = err as { message: string };
+          console.error(error.message);
+          setError(error.message)
+        } else {
+          console.error("Ocorreu um erro desconhecido");
+        }
+        
   }
+}
   return (
     <div className="min-h-screen bg-gradient-to-br from-black to-gray-900 text-white flex items-center justify-center p-4">
       <div className="bg-gray-800 bg-opacity-80 backdrop-blur-sm p-8 rounded-2xl shadow-2xl w-full max-w-md border border-purple-500">

@@ -19,23 +19,45 @@ import { useNavigate, Link } from 'react-router-dom'
 export default function Dashboard() {
     const navigate = useNavigate()
     const [teamName, setTeamName] = useState('')
-    const [teams, setTeams] = useState([])
-    const [invites, setInvites] = useState([])
+    const [teams, setTeams] = useState<{
+        id: string | null | undefined
+        name: string
+        createdBy: string  
+}[]>([]);
+    const [invites, setInvites] = useState<{
+        id: string | null | undefined
+        teamId: string
+}[]>([]);
     const [inviteeId, setInviteeId] = useState('')
     const user = auth.currentUser
+    if (!user) {
+        navigate('/login'); 
+        return null;
+      }
 
     useEffect(() => {
         if (!user) return
 
         const q = query(collection(db, 'teams'), where('members', 'array-contains', user.uid))
         const unsub = onSnapshot(q, (snapshot) => {
-            setTeams(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
-        })
+            setTeams(snapshot.docs.map(doc => {
+                const data = doc.data() as { name: string, createdBy: string } 
+                return {
+                  id: doc.id,
+                  name: data.name,
+                  createdBy: data.createdBy
+                }
+              }))        })
 
         const qInvites = query(collection(db, 'invites'), where('to', '==', user.uid))
         const unsubInvites = onSnapshot(qInvites, (snapshot) => {
-            setInvites(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })))
-        })
+            setInvites(snapshot.docs.map(doc => {
+                const data = doc.data() as { teamId: string }
+                return {
+                  id: doc.id,
+                  teamId: data.teamId
+                }
+              }))        })
 
         return () => {
             unsub()
@@ -50,13 +72,17 @@ export default function Dashboard() {
 
     const handleCreateTeam = async () => {
         if (!teamName.trim()) return
-        await addDoc(collection(db, 'teams'), {
+
+        try {
+            await addDoc(collection(db, 'teams'), {
             name: teamName,
             createdBy: user.uid,
             members: [user.uid]
         })
         setTeamName('')
-    }
+    }catch(err){
+        console.log(err)
+    }}
 
     const handleInvite = async (teamId) => {
         try {

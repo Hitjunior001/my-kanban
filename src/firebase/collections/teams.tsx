@@ -1,5 +1,5 @@
 import { db } from '../config'
-import { doc, updateDoc, arrayUnion, collection, getDocs  } from 'firebase/firestore'
+import { doc, updateDoc, arrayUnion, collection, getDocs, addDoc  } from 'firebase/firestore'
 
 export async function createTeam(name, userId) {
   const docRef = await addDoc(collection(db, 'teams'), {

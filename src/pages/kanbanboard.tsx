@@ -7,14 +7,33 @@ import { getAuth, signOut } from 'firebase/auth';
 export default function KanbanBoard() {
     const { teamId } = useParams();
     const navigate = useNavigate();
-    const [postIts, setPostIts] = useState([]);
+    const [postIts, setPostIts] = useState<{
+        content: string | undefined;
+        createdBy: string;
+        movedBy: any;
+        description: string;
+        title: string;
+        status: string; id: string 
+}[]>([]);
     const [description, setDescription] = useState('');
     const [title, setTitle] = useState('');
 
     useEffect(() => {
         const q = query(collection(db, 'postIts'), where('teamId', '==', teamId));
         const unsub = onSnapshot(q, (snapshot) => {
-            setPostIts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            setPostIts(
+                snapshot.docs.map(doc => {
+                  const data = doc.data() as {
+                    content: string | undefined;
+                    createdBy: string;
+                    movedBy: any;
+                    description: string;
+                    title: string;
+                    status: string;
+                  };
+                  return { id: doc.id, ...data };
+                })
+              );
         });
 
         return () => unsub();
