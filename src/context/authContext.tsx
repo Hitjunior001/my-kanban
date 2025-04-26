@@ -1,7 +1,6 @@
 // src/context/authContext.tsx
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
-import { useNavigate, Link } from 'react-router-dom'
 import { auth } from '../firebase/config'
 
 // Defina o tipo do usuário
