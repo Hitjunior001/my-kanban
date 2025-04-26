@@ -8,6 +8,7 @@ import KanbanPage from './pages/kanbanboard';
 import { AuthProvider, useAuth } from './context/authContext'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  
   const { user } = useAuth()
   return user ? children : <Navigate to="/login" />
 }
