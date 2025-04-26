@@ -1,5 +1,5 @@
 // src/App.jsx
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from './pages/login'
 import RegisterPage from './pages/register'
 import Dashboard from './pages/dashboard'
