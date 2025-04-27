@@ -26,25 +26,23 @@ function formatRelativeTime(timestamp: { seconds: number, nanoseconds: number })
 }
 
 
-const FilterPostIts = ({postIts }) => {
-
+const FilterPostIts = ({ postIts, status }) => {
     return (
-            postIts.filter(postIt => postIt.status === status).map(postIt => (
+        postIts
+            .filter(postIt => postIt.status === status)  
+            .map(postIt => (
                 <div
                     key={postIt.id}
                     className={`${getColorByArea(postIt.area)} p-4 rounded my-2 cursor-move transition-all hover:scale-105 shadow-lg`}
                     draggable
                     onDragStart={(e) => e.dataTransfer.setData('postItId', postIt.id)}
                 >
-
                     <p className="font-bold text-xl mb-2">{postIt.title}</p>
-
                     <hr className="border-t-2 border-white opacity-30 my-2" />
-
-                    <p className="text-base text-white leading-relaxed mb-2"><p className='font-bold'>Missão: </p> {postIt.description}</p>
-
+                    <p className="text-base text-white leading-relaxed mb-2">
+                        <p className="font-bold">Missão: </p> {postIt.description}
+                    </p>
                     <hr className="border-t-2 border-white opacity-30 my-2" />
-
                     <div className="text-sm text-gray-100 space-y-1">
                         {postIt.movedBy && (
                             <p><strong>Movido por:</strong> {postIt.movedBy}</p>
@@ -58,7 +56,7 @@ const FilterPostIts = ({postIts }) => {
                     </p>
                 </div>
             ))
-    )
+    );
 }
 
 export default FilterPostIts;

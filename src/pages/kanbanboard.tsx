@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/config';
 import { useParams, useNavigate } from 'react-router-dom';
-import { collection, onSnapshot, query, where, doc, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { getAuth, signOut } from 'firebase/auth';
-import getUsernameByUid from '../services/user';
 import AddPostItForm from '../components/postIts/AddPostItForm';
+import FilterPostIts from '../components/postIts/filterPostIts';
+import handleMovePostIt from '../components/postIts/handleMovePostIt';
 
 export default function KanbanBoard() {
     const { teamId } = useParams();
@@ -12,22 +13,8 @@ export default function KanbanBoard() {
     const [postIts, setPostIts] = useState<any[]>([]);
     const [existingSprints, setExistingSprints] = useState<string[]>([]);
     const [selectedSprint, setSelectedSprint] = useState('');
+    const [filterCategory, setFilterCategory] = useState('');
     // const [isOwner, setIsOwner] = useState(false);
-
-
-    function formatRelativeTime(timestamp: { seconds: number, nanoseconds: number }) {
-        const createdAt = new Date(timestamp.seconds * 1000);
-        const now = new Date();
-        const diffMs = now.getTime() - createdAt.getTime();
-        const diffMinutes = Math.floor(diffMs / (1000 * 60));
-        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-        if (diffMinutes < 1) return 'Agora mesmo';
-        if (diffMinutes < 60) return `${diffMinutes} min atrás`;
-        if (diffHours < 24) return `${diffHours} h atrás`;
-        return `${diffDays} d atrás`;
-    }
 
     useEffect(() => {
         const q = query(collection(db, 'postIts'), where('teamId', '==', teamId));
@@ -44,7 +31,6 @@ export default function KanbanBoard() {
             });
             setExistingSprints(Array.from(sprints));
         });
-
         return () => unsub();
     }, [teamId]);
 
@@ -69,32 +55,6 @@ export default function KanbanBoard() {
     //     }
     // }, [teamId]);
 
-
-    const handleMovePostIt = async (postItId: string, newStatus: string) => {
-        const auth = getAuth();
-        const user = auth.currentUser;
-
-        if (user) {
-            const username = await getUsernameByUid(user.uid);
-            const postItRef = doc(db, 'postIts', postItId);
-
-            if (newStatus === 'done') {
-                const confirm = window.confirm('Deseja realmente marcar como finalizado?');
-                if (confirm) {
-                    await updateDoc(postItRef, {
-                        status: 'finalizado',
-                        movedBy: username,
-                    });
-                }
-            } else {
-                await updateDoc(postItRef, {
-                    status: newStatus,
-                    movedBy: username,
-                });
-            }
-        }
-    };
-
     const handleLogout = () => {
         const auth = getAuth();
         signOut(auth)
@@ -108,19 +68,6 @@ export default function KanbanBoard() {
 
     const handleGoToDashboard = () => {
         navigate('/dashboard');
-    };
-
-    const getColorByArea = (area: string) => {
-        switch (area) {
-            case 'developers':
-                return 'bg-blue-600';
-            case 'design':
-                return 'bg-pink-500';
-            case 'engenheiro':
-                return 'bg-yellow-500';
-            default:
-                return 'bg-gray-700';
-        }
     };
 
     return (
@@ -145,13 +92,12 @@ export default function KanbanBoard() {
                             selectedSprint={selectedSprint}
                         />
             )} */}
-                            <AddPostItForm
-                            teamId={teamId}
-                            setSelectedSprint={setSelectedSprint}
-                            existingSprints={existingSprints}
-                            selectedSprint={selectedSprint}
-                        />
-
+                <AddPostItForm
+                    teamId={teamId}
+                    setSelectedSprint={setSelectedSprint}
+                    existingSprints={existingSprints}
+                    selectedSprint={selectedSprint}
+                    />
             <div className="flex space-x-6">
                 {['todo', 'doing', 'done'].map((status) => (
                     <div
@@ -166,36 +112,7 @@ export default function KanbanBoard() {
                         <h2 className="text-xl font-bold text-cyan-400 mb-2">
                             {status === 'todo' ? 'A Fazer' : status === 'doing' ? 'Fazendo' : 'Concluir'}
                         </h2>
-
-                        {postIts.filter(postIt => postIt.status === status).map(postIt => (
-                            <div
-                                key={postIt.id}
-                                className={`${getColorByArea(postIt.area)} p-4 rounded my-2 cursor-move transition-all hover:scale-105 shadow-lg`}
-                                draggable
-                                onDragStart={(e) => e.dataTransfer.setData('postItId', postIt.id)}
-                            >
-
-                                <p className="font-bold text-xl mb-2">{postIt.title}</p>
-
-                                <hr className="border-t-2 border-white opacity-30 my-2" />
-
-                                <p className="text-base text-white leading-relaxed mb-2"><p className='font-bold'>Missão: </p> {postIt.description}</p>
-
-                                <hr className="border-t-2 border-white opacity-30 my-2" />
-
-                                <div className="text-sm text-gray-100 space-y-1">
-                                    {postIt.movedBy && (
-                                        <p><strong>Movido por:</strong> {postIt.movedBy}</p>
-                                    )}
-                                    {postIt.sprintName && (
-                                        <p><strong>Sprint:</strong> {postIt.sprintName}</p>
-                                    )}
-                                </div>
-                                <p className="text-xs text-gray-400">
-                                    {formatRelativeTime(postIt.createdAt)}
-                                </p>
-                            </div>
-                        ))}
+                        <FilterPostIts postIts={postIts} status={status} />
                     </div>
                 ))}
             </div>

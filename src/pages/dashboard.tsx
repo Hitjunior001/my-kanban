@@ -10,8 +10,7 @@ import {
     updateDoc,
     doc,
     arrayUnion,
-    deleteDoc,
-    getDocs
+    deleteDoc
 } from 'firebase/firestore'
 import { signOut } from 'firebase/auth'
 import { useNavigate, Link } from 'react-router-dom'
@@ -28,7 +27,6 @@ export default function Dashboard() {
         id: string | null | undefined
         teamId: string
 }[]>([]);
-    const [inviteeId, setInviteeId] = useState('')
     const user = auth.currentUser
     if (!user) {
         navigate('/login'); 
@@ -84,37 +82,6 @@ export default function Dashboard() {
         console.log(err)
     }}
 
-    const handleInvite = async (teamId) => {
-        try {
-            if (!inviteeId.trim()) {
-                console.warn('Email do convidado está vazio!')
-                return
-            }
-
-            const q = query(collection(db, 'users'), where('email', '==', inviteeId.trim()))
-            const snapshot = await getDocs(q)
-
-            if (snapshot.empty) {
-                alert('Usuário não encontrado com esse e-mail.')
-                return
-            }
-
-            const docSnap = snapshot.docs[0]
-            const inviteeUID = docSnap.id // ← Pega o UID corretamente
-
-            await addDoc(collection(db, 'invites'), {
-                teamId,
-                from: user.uid,
-                to: inviteeUID
-            })
-
-            setInviteeId('')
-        } catch (err) {
-            console.error('Erro ao convidar:', err)
-            alert('Erro ao enviar convite. Verifique as permissões e tente novamente.')
-        }
-    }
-
     const handleAcceptInvite = async (invite) => {
         const teamRef = doc(db, 'teams', invite.teamId)
         await updateDoc(teamRef, {
@@ -159,28 +126,17 @@ export default function Dashboard() {
                 <h2 className="text-xl mb-2">Minhas Equipes</h2>
                 {teams.map(team => (
                     <div key={team.id} className="border p-3 rounded bg-gray-900 mb-2">
-                        <p><b>{team.name}</b></p>
-                        <p className="text-sm text-gray-400">Dono: {team.createdBy === user.uid ? 'Você' : team.createdBy}</p>
-                        {team.createdBy === user.uid && (
-                            <div className="mt-2">
-                                <input
-                                    type="text"
-                                    placeholder="Email do membro"
-                                    value={inviteeId}
-                                    onChange={e => setInviteeId(e.target.value)}
-                                    className="text-white p-1 rounded"
-                                />
-                                <button
-                                    onClick={() => handleInvite(team.id)}
-                                    className="bg-cyan-600 px-3 py-1 rounded ml-2"
-                                >Convidar</button>
-                            </div>
-                        )}
+                        <div className='flex justify-between'>
+                        <div>
+                            <p><b>{team.name}</b></p>
+                            <p className="text-sm text-gray-400">Dono: {team.createdBy === user.uid ? 'Você' : team.createdBy}</p>
+                        </div>
                         <div className="mt-2">
                             <Link
                                 to={`/kanban/${team.id}`}
-                                className="text-cyan-400 hover:underline text-sm"
-                            >Acessar quadro Kanban</Link>
+                                className="text-cyan-400 hover:underline text-sm rounded bg-gray-900"
+                                >Acessar quadro Kanban</Link>
+                            </div>
                         </div>
                     </div>
                 ))}
