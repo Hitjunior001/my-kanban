@@ -1,4 +1,3 @@
-// src/pages/Dashboard.jsx
 import { useEffect, useState } from 'react'
 import { auth, db } from '../firebase/config'
 import {
@@ -6,14 +5,12 @@ import {
     addDoc,
     onSnapshot,
     query,
-    where,
-    updateDoc,
-    doc,
-    arrayUnion,
-    deleteDoc
+    where
 } from 'firebase/firestore'
-import { signOut } from 'firebase/auth'
+
 import { useNavigate, Link } from 'react-router-dom'
+import UserProfileMenu from '../components/user/UserProfile'
+
 
 export default function Dashboard() {
     const navigate = useNavigate()
@@ -23,14 +20,11 @@ export default function Dashboard() {
         name: string
         createdBy: string  
 }[]>([]);
-    const [invites, setInvites] = useState<{
-        id: string | null | undefined
-        teamId: string
-}[]>([]);
-    const user = auth.currentUser
-    if (!user) {
-        navigate('/login'); 
-        return null;
+
+const user = auth.currentUser
+if (!user) {
+    navigate('/login'); 
+    return null;
       }
 
     useEffect(() => {
@@ -47,26 +41,11 @@ export default function Dashboard() {
                 }
               }))        })
 
-        const qInvites = query(collection(db, 'invites'), where('to', '==', user.uid))
-        const unsubInvites = onSnapshot(qInvites, (snapshot) => {
-            setInvites(snapshot.docs.map(doc => {
-                const data = doc.data() as { teamId: string }
-                return {
-                  id: doc.id,
-                  teamId: data.teamId
-                }
-              }))        })
-
         return () => {
             unsub()
-            unsubInvites()
         }
     }, [user])
 
-    const handleLogout = async () => {
-        await signOut(auth)
-        navigate('/login')
-    }
 
     const handleCreateTeam = async () => {
         if (!teamName.trim()) return
@@ -82,19 +61,15 @@ export default function Dashboard() {
         console.log(err)
     }}
 
-    const handleAcceptInvite = async (invite) => {
-        const teamRef = doc(db, 'teams', invite.teamId)
-        await updateDoc(teamRef, {
-            members: arrayUnion(user.uid)
-        })
-        await deleteDoc(doc(db, 'invites', invite.id))
-    }
+
 
     return (
         <div className="min-h-screen bg-black text-white p-6 space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-4xl font-tech text-cyan-400">Painel do Robô</h1>
-                <button onClick={handleLogout} className="bg-red-600 hover:bg-red-500 px-4 py-2 rounded">Sair</button>
+        
+        <div className="flex justify-between items-center">
+                <h1 className="text-4xl font-tech text-cyan-400">Painel</h1>
+
+            <UserProfileMenu/>
             </div>
 
             <div className="space-y-4">
@@ -109,18 +84,7 @@ export default function Dashboard() {
                 <button onClick={handleCreateTeam} className="bg-green-600 px-4 py-2 rounded ml-2">Criar</button>
             </div>
 
-            <div>
-                <h2 className="text-xl mb-2">Convites</h2>
-                {invites.map(invite => (
-                    <div key={invite.id} className="mb-2">
-                        Convite para equipe <b>{invite.teamId}</b>
-                        <button
-                            onClick={() => handleAcceptInvite(invite)}
-                            className="bg-blue-600 ml-2 px-3 py-1 rounded"
-                        >Aceitar</button>
-                    </div>
-                ))}
-            </div>
+
 
             <div>
                 <h2 className="text-xl mb-2">Minhas Equipes</h2>

@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/config';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { getAuth, signOut } from 'firebase/auth';
 import AddPostItForm from '../components/postIts/AddPostItForm';
-import FilterPostIts from '../components/postIts/filterPostIts';
+import FilterPostIts from '../components/postIts/FilterPostIts';
 import handleMovePostIt from '../components/postIts/handleMovePostIt';
+import UserProfileMenu from '../components/user/UserProfile';
+import InviteMember from '../components/invites/InviteMember';
 
 export default function KanbanBoard() {
     const { teamId } = useParams();
-    const navigate = useNavigate();
     const [postIts, setPostIts] = useState<any[]>([]);
     const [existingSprints, setExistingSprints] = useState<string[]>([]);
     const [selectedSprint, setSelectedSprint] = useState('');
-    const [filterCategory, setFilterCategory] = useState('');
+    const [ openAddTask, setOpenAddTask] =  useState(Boolean);
+
+    // const [filterCategory, setFilterCategory] = useState('');
     // const [isOwner, setIsOwner] = useState(false);
 
     useEffect(() => {
@@ -55,35 +57,24 @@ export default function KanbanBoard() {
     //     }
     // }, [teamId]);
 
-    const handleLogout = () => {
-        const auth = getAuth();
-        signOut(auth)
-            .then(() => {
-                navigate('/');
-            })
-            .catch((error) => {
-                console.error("Erro ao sair: ", error);
-            });
-    };
-
-    const handleGoToDashboard = () => {
-        navigate('/dashboard');
-    };
+    const toggleAddTask = () => {
+        setOpenAddTask(prev => !prev);
+    }
 
     return (
         <div className="min-h-screen bg-black text-white p-6 space-y-6">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-4xl font-tech text-cyan-400">Quadro Kanban da Equipe</h1>
                 <div className="space-x-4">
-                    <button onClick={handleGoToDashboard} className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">
-                        Voltar para o Dashboard
-                    </button>
-                    <button onClick={handleLogout} className="bg-red-700 hover:bg-red-600 px-4 py-2 rounded">
-                        Sair
-                    </button>
+
+                    <UserProfileMenu/>
+
                 </div>
             </div>
 
+            <button onClick={toggleAddTask} className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded hover:bg-gray-700">
+                        <span>Adicionar Task + </span>
+            </button>
             {/* {isOwner && (
                         <AddPostItForm
                             teamId={teamId}
@@ -92,12 +83,17 @@ export default function KanbanBoard() {
                             selectedSprint={selectedSprint}
                         />
             )} */}
+            {openAddTask && (
+
                 <AddPostItForm
-                    teamId={teamId}
-                    setSelectedSprint={setSelectedSprint}
-                    existingSprints={existingSprints}
-                    selectedSprint={selectedSprint}
-                    />
+                teamId={teamId}
+                setSelectedSprint={setSelectedSprint}
+                existingSprints={existingSprints}
+                selectedSprint={selectedSprint}
+                />
+            )}
+            <InviteMember/>
+            
             <div className="flex space-x-6">
                 {['todo', 'doing', 'done'].map((status) => (
                     <div
