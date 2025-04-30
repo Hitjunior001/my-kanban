@@ -29,18 +29,34 @@ function formatRelativeTime(timestamp: { seconds: number, nanoseconds: number })
 const FilterPostIts = ({ postIts, status }) => {
     return (
         postIts
-            .filter(postIt => postIt.status === status)  
+            .filter(postIt => postIt.status === status)
             .map(postIt => (
                 <div
                     key={postIt.id}
-                    className={`${getColorByArea(postIt.area)} p-4 rounded my-2 cursor-move transition-all hover:scale-105 shadow-lg`}
-                    draggable
-                    onDragStart={(e) => e.dataTransfer.setData('postItId', postIt.id)}
+                    className={`
+        ${getColorByArea(postIt.area)} 
+        p-4 rounded my-2 
+        ${postIt.status === 'finalizado' ? 'opacity-60 cursor-default line-through' : 'cursor-move hover:scale-105'}
+        transition-all shadow-lg
+    `}
+                    draggable={postIt.status !== 'finalizado'}
+                    onDragStart={(e) => {
+                        if (postIt.status !== 'finalizado') {
+                            e.dataTransfer.setData('postItId', postIt.id);
+                        }
+                    }}
                 >
-                    <p className="font-bold text-xl mb-2">{postIt.title}</p>
+                    <div className="flex justify-between items-center">
+                        <p className={`font-bold text-xl mb-2 ${postIt.status === 'finalizado' ? 'text-green-300' : ''}`}>
+                            {postIt.title}
+                        </p>
+                        {postIt.status === 'finalizado' && (
+                            <span className="text-sm bg-green-700 text-white px-2 py-1 rounded">Finalizado ✅</span>
+                        )}
+                    </div>
                     <hr className="border-t-2 border-white opacity-30 my-2" />
                     <p className="text-base text-white leading-relaxed mb-2">
-                        <p className="font-bold">Missão: </p> {postIt.description}
+                        <span className="font-bold">Missão: </span> {postIt.description}
                     </p>
                     <hr className="border-t-2 border-white opacity-30 my-2" />
                     <div className="text-sm text-gray-100 space-y-1">
@@ -55,6 +71,7 @@ const FilterPostIts = ({ postIts, status }) => {
                         {formatRelativeTime(postIt.createdAt)}
                     </p>
                 </div>
+
             ))
     );
 }

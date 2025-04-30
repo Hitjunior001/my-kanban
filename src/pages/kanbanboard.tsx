@@ -14,6 +14,8 @@ export default function KanbanBoard() {
     const [existingSprints, setExistingSprints] = useState<string[]>([]);
     const [selectedSprint, setSelectedSprint] = useState('');
     const [ openAddTask, setOpenAddTask] =  useState(Boolean);
+    const [ openAddMember, setOpenAddMember] =  useState(Boolean);
+
 
     // const [filterCategory, setFilterCategory] = useState('');
     // const [isOwner, setIsOwner] = useState(false);
@@ -22,7 +24,6 @@ export default function KanbanBoard() {
         const q = query(collection(db, 'postIts'), where('teamId', '==', teamId));
         const unsub = onSnapshot(q, (snapshot) => {
             const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as any }))
-                .filter(postIt => postIt.status !== 'finalizado');
             setPostIts(posts);
 
             const sprints = new Set<string>();
@@ -60,6 +61,9 @@ export default function KanbanBoard() {
     const toggleAddTask = () => {
         setOpenAddTask(prev => !prev);
     }
+    const toggleAddMember = () => {
+        setOpenAddMember(prev => !prev);
+    }
 
     return (
         <div className="min-h-screen bg-black text-white p-6 space-y-6">
@@ -92,10 +96,15 @@ export default function KanbanBoard() {
                 selectedSprint={selectedSprint}
                 />
             )}
-            <InviteMember/>
-            
+                        <button onClick={toggleAddMember} className="flex items-center space-x-2 bg-gray-800 px-4 py-2 rounded hover:bg-gray-700">
+                        <span>Adicionar Membro + </span>
+            </button>
+            {openAddMember && (
+                <InviteMember/>
+            )
+        }
             <div className="flex space-x-6">
-                {['todo', 'doing', 'done'].map((status) => (
+                {['todo', 'doing', 'finalizado'].map((status) => (
                     <div
                         key={status}
                         className="bg-gray-800 p-4 rounded w-1/3"
@@ -106,7 +115,7 @@ export default function KanbanBoard() {
                         onDragOver={(e) => e.preventDefault()}
                     >
                         <h2 className="text-xl font-bold text-cyan-400 mb-2">
-                            {status === 'todo' ? 'A Fazer' : status === 'doing' ? 'Fazendo' : 'Concluir'}
+                            {status === 'todo' ? 'A Fazer' : status === 'doing' ? 'Fazendo' : 'Concluido'}
                         </h2>
                         <FilterPostIts postIts={postIts} status={status} />
                     </div>
