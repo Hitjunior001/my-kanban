@@ -36,7 +36,7 @@ const AddPostItForm = ({ teamId, setSelectedSprint, existingSprints, selectedSpr
 
   return (
     <form onSubmit={handleAddPostIt} className="bg-gray-800 p-6 rounded-lg shadow-md space-y-4 max-w-md mx-auto">
-      <h1 className="text-2xl text-white font-semibold text-center">Criar Task</h1>
+      <h1 className="text-2xl text-white font-semibold text-center"> Criar Task</h1>
 
       <div className="space-y-4">
         <div>

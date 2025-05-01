@@ -4,6 +4,7 @@ import LoginPage from './pages/login'
 import RegisterPage from './pages/register'
 import Dashboard from './pages/dashboard'
 import KanbanPage from './pages/kanbanboard';
+import DocumentPage from './pages/editor';
 
 import { AuthProvider, useAuth } from './context/authContext'
 
@@ -32,6 +33,13 @@ function App() {
             path="/kanban/:teamId"
             element={<ProtectedRoute>
                       <KanbanPage />
+                    </ProtectedRoute>}
+          />
+
+            <Route
+            path="/document"
+            element={<ProtectedRoute>
+                      <DocumentPage  />
                     </ProtectedRoute>}
           />
           <Route path="*" element={<Navigate to="/login" />} />

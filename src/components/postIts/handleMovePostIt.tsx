@@ -7,36 +7,68 @@ const handleMovePostIt = async (postItId: string, newStatus: string) => {
     const auth = getAuth();
     const user = auth.currentUser;
 
-    if (user) {
-        const postItRef = doc(db, 'postIts', postItId);
-        const postItSnap = await getDoc(postItRef);
+    if (!user) return;
 
-        if (!postItSnap.exists()) return;
+    const postItRef = doc(db, 'postIts', postItId);
+    const postItSnap = await getDoc(postItRef);
 
-        const currentData = postItSnap.data();
+    if (!postItSnap.exists()) return;
 
-        if (currentData.status === 'finalizado') {
-            alert('Essa tarefa já foi finalizada');
+    const currentData = postItSnap.data();
+    const currentStatus = currentData.status;
+
+    // Evita ações se status não mudou
+    if (currentStatus === newStatus) return;
+
+    // Impede mudança de tarefas finalizadas
+    if (currentStatus === 'finalizado') {
+        alert('Essa tarefa já foi finalizada');
+        return;
+    }
+
+    const username = await getUsernameByUid(user.uid);
+
+    // Regra: só pode mover de "todo" para "doing"
+    if (currentStatus === 'todo' && newStatus !== 'doing') {
+        alert('Tarefas em "A Fazer" só podem ser movidas para "Fazendo".');
+        return;
+    }
+
+    // Regra: só testador pode mover de "teste" para "bugs"
+    if (currentStatus === 'teste' && newStatus === 'bugs') {
+        if (username !== 'testador') {
+            alert('Apenas o testador pode mover a tarefa para "Bugs".');
+            return;
+        }
+    }
+
+    // Regra: só testador pode mover de "teste" para "finalizado"
+    if (currentStatus === 'teste' && newStatus === 'finalizado') {
+        if (username !== 'testador') {
+            alert('Apenas o usuário testador pode concluir esta tarefa.');
             return;
         }
 
-        const username = await getUsernameByUid(user.uid);
-
-        if (newStatus === 'done') {
-            const confirm = window.confirm('Deseja realmente marcar como finalizado?');
-            if (confirm) {
-                await updateDoc(postItRef, {
-                    status: 'finalizado',
-                    movedBy: username,
-                });
-            }
-        } else {
-            await updateDoc(postItRef, {
-                status: newStatus,
-                movedBy: username,
-            });
-        }
+        const confirm = window.confirm('Deseja realmente marcar como finalizado?');
+        if (!confirm) return;
     }
+
+    // Regra: não pode ir direto para "finalizado" de outro lugar que não seja "teste"
+    if (newStatus === 'finalizado' && currentStatus !== 'teste') {
+        alert('A tarefa só pode ser finalizada a partir da etapa de teste.');
+        return;
+    }
+
+    // Atualiza status — evita mudar movedBy se já estiver em "doing"
+    const updatePayload: any = {
+        status: newStatus,
+    };
+
+    if (currentStatus !== 'doing') {
+        updatePayload.movedBy = username;
+    }
+
+    await updateDoc(postItRef, updatePayload);
 };
 
 export default handleMovePostIt;
