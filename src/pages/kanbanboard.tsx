@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { db } from '../firebase/config';
-import { Link, useParams } from 'react-router-dom';
+import {Link, useParams } from 'react-router-dom';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import AddPostItForm from '../components/postIts/AddPostItForm';
 import FilterPostIts from '../components/postIts/FilterPostIts';
 import handleMovePostIt from '../components/postIts/handleMovePostIt';
 import UserProfileMenu from '../components/user/UserProfile';
 import InviteMember from '../components/invites/InviteMember';
+import FilterComponent from '../components/FilterForm';
 
 export default function KanbanBoard() {
     const { teamId } = useParams();
@@ -15,20 +16,30 @@ export default function KanbanBoard() {
     const [selectedSprint, setSelectedSprint] = useState('');
     const [openAddTask, setOpenAddTask] = useState(false);
     const [openAddMember, setOpenAddMember] = useState(false);
+    const [usernames, setUsernames] = useState<string[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
+    const [filters, setFilters] = useState({ username: '', category: '' });
+
 
     useEffect(() => {
         const q = query(collection(db, 'postIts'), where('teamId', '==', teamId));
         const unsub = onSnapshot(q, (snapshot) => {
             const posts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() as any }))
             setPostIts(posts);
-
+    
             const sprints = new Set<string>();
+            const movedBySet = new Set<string>();
+            const areaSet = new Set<string>();
+    
             posts.forEach(post => {
-                if (post.sprintName) {
-                    sprints.add(post.sprintName);
-                }
+                if (post.sprintName) sprints.add(post.sprintName);
+                if (post.movedBy) movedBySet.add(post.movedBy);
+                if (post.area) areaSet.add(post.area);
             });
+    
             setExistingSprints(Array.from(sprints));
+            setUsernames(Array.from(movedBySet));
+            setCategories(Array.from(areaSet));
         });
         return () => unsub();
     }, [teamId]);
@@ -57,6 +68,7 @@ export default function KanbanBoard() {
                 <span>Adicionar Task + </span>
             </button>
 
+
             {openAddTask && (
                 <AddPostItForm
                     teamId={teamId}
@@ -71,6 +83,12 @@ export default function KanbanBoard() {
             </button>
 
             {openAddMember && <InviteMember />}
+
+            <FilterComponent usernames={usernames}
+                        categories={categories}
+                        onFilterChange={setFilters}
+                        
+            />
 
             <div className="flex justify-end mb-4">
                 <Link to="/document">
@@ -96,7 +114,8 @@ export default function KanbanBoard() {
                         }`}>
                             {columnLabels[status]}
                         </h2>
-                        <FilterPostIts postIts={postIts} status={status} />
+                        <FilterPostIts postIts={postIts} status={status} filters={filters}
+                        />
                     </div>
                 ))}
             </div>

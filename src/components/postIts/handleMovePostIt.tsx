@@ -17,10 +17,8 @@ const handleMovePostIt = async (postItId: string, newStatus: string) => {
     const currentData = postItSnap.data();
     const currentStatus = currentData.status;
 
-    // Evita ações se status não mudou
     if (currentStatus === newStatus) return;
 
-    // Impede mudança de tarefas finalizadas
     if (currentStatus === 'finalizado') {
         alert('Essa tarefa já foi finalizada');
         return;
@@ -28,13 +26,11 @@ const handleMovePostIt = async (postItId: string, newStatus: string) => {
 
     const username = await getUsernameByUid(user.uid);
 
-    // Regra: só pode mover de "todo" para "doing"
     if (currentStatus === 'todo' && newStatus !== 'doing') {
         alert('Tarefas em "A Fazer" só podem ser movidas para "Fazendo".');
         return;
     }
 
-    // Regra: só testador pode mover de "teste" para "bugs"
     if (currentStatus === 'teste' && newStatus === 'bugs') {
         if (username !== 'testador') {
             alert('Apenas o testador pode mover a tarefa para "Bugs".');
@@ -42,7 +38,6 @@ const handleMovePostIt = async (postItId: string, newStatus: string) => {
         }
     }
 
-    // Regra: só testador pode mover de "teste" para "finalizado"
     if (currentStatus === 'teste' && newStatus === 'finalizado') {
         if (username !== 'testador') {
             alert('Apenas o usuário testador pode concluir esta tarefa.');
@@ -53,13 +48,11 @@ const handleMovePostIt = async (postItId: string, newStatus: string) => {
         if (!confirm) return;
     }
 
-    // Regra: não pode ir direto para "finalizado" de outro lugar que não seja "teste"
     if (newStatus === 'finalizado' && currentStatus !== 'teste') {
         alert('A tarefa só pode ser finalizada a partir da etapa de teste.');
         return;
     }
 
-    // Atualiza status — evita mudar movedBy se já estiver em "doing"
     const updatePayload: any = {
         status: newStatus,
     };
@@ -68,7 +61,25 @@ const handleMovePostIt = async (postItId: string, newStatus: string) => {
         updatePayload.movedBy = username;
     }
 
-    await updateDoc(postItRef, updatePayload);
-};
+    if (currentStatus === 'teste' && newStatus === 'bugs') {
+        if (username !== 'testador') {
+            alert('Apenas o testador pode mover a tarefa para "Bugs".');
+            return;
+        }
+    
+        const bugDescription = window.prompt('Descreva o problema encontrado:');
+        if (!bugDescription || bugDescription.trim() === '') {
+            alert('É necessário descrever o problema para mover para Bugs.');
+            return;
+        }
+    
+        updatePayload.status = newStatus;
+        updatePayload.movedBy = username;
+        updatePayload.bugDescription = bugDescription;
+    
+        await updateDoc(postItRef, updatePayload);
+        return;
+    }
+    };
 
 export default handleMovePostIt;

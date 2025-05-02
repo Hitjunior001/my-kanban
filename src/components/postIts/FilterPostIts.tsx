@@ -26,19 +26,22 @@ function formatRelativeTime(timestamp: { seconds: number, nanoseconds: number })
 }
 
 
-const FilterPostIts = ({ postIts, status }) => {
+const FilterPostIts = ({ postIts, status, filters }) => {
     return (
         postIts
             .filter(postIt => postIt.status === status)
+            .filter(postIt => 
+                (!filters.username || postIt.movedBy === filters.username) &&
+                (!filters.category || postIt.area === filters.category)
+            )
             .map(postIt => (
-                <div
-                    key={postIt.id}
+                <div key={postIt.id}
                     className={`
-        ${getColorByArea(postIt.area)} 
-        p-4 rounded my-2 
-        ${postIt.status === 'finalizado' ? 'opacity-60 cursor-default line-through' : 'cursor-move hover:scale-105'}
-        transition-all shadow-lg
-    `}
+                        ${getColorByArea(postIt.area)} 
+                        p-4 rounded my-2 
+                        ${postIt.status === 'finalizado' ? 'opacity-60 cursor-default line-through' : 'cursor-move hover:scale-105'}
+                        transition-all shadow-lg
+                    `}
                     draggable={postIt.status !== 'finalizado'}
                     onDragStart={(e) => {
                         if (postIt.status !== 'finalizado') {
@@ -47,7 +50,7 @@ const FilterPostIts = ({ postIts, status }) => {
                     }}
                 >
                     <div className="flex justify-between items-center">
-                        <p className={`font-bold text-xl mb-2 ${postIt.status === 'finalizado' ? 'text-green-300' : ''}`}>
+                        <p className={`font-bold text-xl mb-2 ${postIt.status === 'finalizado' ? 'text-green-300' : '' }`}>
                             {postIt.title}
                         </p>
                         {postIt.status === 'finalizado' && (
@@ -67,11 +70,19 @@ const FilterPostIts = ({ postIts, status }) => {
                             <p><strong>Sprint:</strong> {postIt.sprintName}</p>
                         )}
                     </div>
-                    <p className="text-xs text-gray-400">
+                    {postIt.status === 'bugs' && postIt.bugDescription && (
+                    <div className="mt-3 border-l-4 border-red-500 bg-red-900 bg-opacity-20 p-3 rounded">
+                        <p className="text-red-400 font-semibold flex items-center mb-1">
+                            <span className="mr-2">🐞</span> Descrição do Bug
+                        </p>
+                        <p className="text-red-200 text-sm">{postIt.bugDescription}</p>
+                    </div>
+                    )}
+                        <p className="text-xs text-gray-400">
+
                         {formatRelativeTime(postIt.createdAt)}
                     </p>
                 </div>
-
             ))
     );
 }

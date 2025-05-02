@@ -46,7 +46,7 @@ const AddPostItForm = ({ teamId, setSelectedSprint, existingSprints, selectedSpr
             type="text"
             value={title}
             onChange={e => setTitleState(e.target.value)}
-            className="text-black p-3 rounded-lg w-full border-2 border-gray-400 focus:outline-none focus:border-green-500"
+            className="text-white p-3 rounded-lg w-full border-2 border-gray-400 focus:outline-none focus:border-green-500"
           />
         </div>
 
@@ -56,7 +56,7 @@ const AddPostItForm = ({ teamId, setSelectedSprint, existingSprints, selectedSpr
             id="description"
             value={description}
             onChange={e => setDescriptionState(e.target.value)}
-            className="text-black p-3 rounded-lg w-full border-2 border-gray-400 focus:outline-none focus:border-green-500"
+            className="text-white p-3 rounded-lg w-full border-2 border-gray-400 focus:outline-none focus:border-green-500"
           />
         </div>
 
@@ -66,7 +66,7 @@ const AddPostItForm = ({ teamId, setSelectedSprint, existingSprints, selectedSpr
             id="area"
             value={area}
             onChange={e => setAreaState(e.target.value)}
-            className="text-black p-3 rounded-lg w-full border-2 border-gray-400 focus:outline-none focus:border-green-500"
+            className="text-white p-3 rounded-lg w-full border-2 border-gray-400 focus:outline-none focus:border-green-500"
           >
             <option value="developers">Developers</option>
             <option value="design">Design</option>
@@ -83,7 +83,7 @@ const AddPostItForm = ({ teamId, setSelectedSprint, existingSprints, selectedSpr
               setSelectedSprint(e.target.value);
               setSprintNameState(e.target.value);
             }}
-            className="text-black p-3 rounded-lg w-full border-2 border-gray-400 focus:outline-none focus:border-green-500"
+            className="text-white p-3 rounded-lg w-full border-2 border-gray-400 focus:outline-none focus:border-green-500"
           >
             <option value="">Nova Sprint</option>
             {existingSprints.map(sprint => (
@@ -102,7 +102,7 @@ const AddPostItForm = ({ teamId, setSelectedSprint, existingSprints, selectedSpr
                   type="text"
                   value={sprintName}
                   onChange={e => setSprintNameState(e.target.value)}
-                  className="text-black p-3 rounded-lg w-full border-2 border-gray-400 focus:outline-none focus:border-green-500"
+                  className="text-white p-3 rounded-lg w-full border-2 border-gray-400 focus:outline-none focus:border-green-500"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -113,7 +113,7 @@ const AddPostItForm = ({ teamId, setSelectedSprint, existingSprints, selectedSpr
                     type="date"
                     value={sprintStartDate}
                     onChange={e => setSprintStartDateState(e.target.value)}
-                    className="text-black p-3 rounded-lg w-full border-2 border-gray-400 focus:outline-none focus:border-green-500"
+                    className="text-white p-3 rounded-lg w-full border-2 border-gray-400 focus:outline-none focus:border-green-500"
                   />
                 </div>
                 <div>
@@ -123,7 +123,7 @@ const AddPostItForm = ({ teamId, setSelectedSprint, existingSprints, selectedSpr
                     type="date"
                     value={sprintEndDate}
                     onChange={e => setSprintEndDateState(e.target.value)}
-                    className="text-black p-3 rounded-lg w-full border-2 border-gray-400 focus:outline-none focus:border-green-500"
+                    className="text-white p-3 rounded-lg w-full border-2 border-gray-400 focus:outline-none focus:border-green-500"
                   />
                 </div>
               </div>
