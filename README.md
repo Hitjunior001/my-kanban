@@ -1,54 +1,69 @@
-# React + TypeScript + Vite
+# 🗂️ Kanban Personalizado para Gestão de Projetos
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este é um aplicativo web estilo Kanban desenvolvido por mim, com foco na colaboração entre desenvolvedores da minha equipe. O sistema foi criado porque nenhuma ferramenta disponível oferecia exatamente o que precisávamos, então decidi construir uma solução sob medida.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🎯 Objetivo
 
-## Expanding the ESLint configuration
+Criar uma plataforma de gerenciamento de projetos que atendesse às necessidades específicas da equipe de desenvolvimento, com autenticação segura, organização por tarefas e atualizações em tempo real para facilitar o trabalho em conjunto.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 🚀 Tecnologias Utilizadas
+
+- **ReactJS** (interface do usuário)
+- **Vite.js** (build tool ultrarrápida)
+- **Firebase Authentication** (login seguro)
+- **Firebase Realtime Database** (banco de dados em tempo real)
+- **JavaScript**, **HTML5**, **CSS3**
+
+---
+
+## 🧩 Funcionalidades
+
+- Autenticação de usuários com Firebase
+- Criação e gerenciamento de quadros Kanban
+- Atribuição de tarefas por coluna (A Fazer, Em Progresso, Teste, Bugs, Concluído)
+- Sincronização em tempo real entre membros da equipe
+- Interface amigável e responsiva
+
+---
+
+## 🛠️ Instalação
+
+1. **Clone o repositório:**
+
+```bash
+git clone https://github.com/Hitjunior001/my-kanban.git
+cd /my-kanban
+npm install
+```
+Configure o Firebase:
+
+Crie um projeto em https://console.firebase.google.com
+Ative a autenticação e realtime Database
+
+Crie um arquivo .env na raiz com as credenciais:
+
+.env
+```
+VITE_API_KEY=sua_api_key
+VITE_AUTH_DOMAIN=seu_auth_domain
+VITE_DATABASE_URL=sua_database_url
+VITE_PROJECT_ID=seu_project_id
+VITE_STORAGE_BUCKET=seu_storage_bucket
+VITE_MESSAGING_SENDER_ID=seu_sender_id
+VITE_APP_ID=seu_app_id
+Inicie o servidor de desenvolvimento:
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+🤝 Contribuição
+Este projeto foi desenvolvido com foco nas necessidades da minha equipe, mas sugestões de melhoria são bem-vindas!
+Sinta-se livre para forkar, enviar pull requests ou abrir issues.
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+
+📌 Link do Projeto
+GitHub: https://github.com/Hitjunior001/my-kanban/
+Demonstração: https://hitjunior001.github.io/my-kanban/#/login
