@@ -31,18 +31,18 @@ const handleMovePostIt = async (postItId: string, newStatus: string) => {
         return;
     }
 
-    if (currentStatus === 'teste' && newStatus === 'bugs') {
-        if (username !== 'testador') {
-            alert('Apenas o testador pode mover a tarefa para "Bugs".');
-            return;
-        }
-    }
+    // if (currentStatus === 'teste' && newStatus === 'bugs') {
+    //     if (username !== 'testador') {
+    //         alert('Apenas o testador pode mover a tarefa para "Bugs".');
+    //         return;
+    //     }
+    // }
 
     if (currentStatus === 'teste' && newStatus === 'finalizado') {
-        if (username !== 'testador') {
-            alert('Apenas o usuário testador pode concluir esta tarefa.');
-            return;
-        }
+        // if (username !== 'testador') {
+        //     alert('Apenas o usuário testador pode concluir esta tarefa.');
+        //     return;
+        // }
 
         const confirm = window.confirm('Deseja realmente marcar como finalizado?');
         if (!confirm) return;
@@ -62,10 +62,10 @@ const handleMovePostIt = async (postItId: string, newStatus: string) => {
     }
 
     if (currentStatus === 'teste' && newStatus === 'bugs') {
-        if (username !== 'testador') {
-            alert('Apenas o testador pode mover a tarefa para "Bugs".');
-            return;
-        }
+        // if (username !== 'testador') {
+        //     alert('Apenas o testador pode mover a tarefa para "Bugs".');
+        //     return;
+        // }
     
         const bugDescription = window.prompt('Descreva o problema encontrado:');
         if (!bugDescription || bugDescription.trim() === '') {
@@ -77,9 +77,9 @@ const handleMovePostIt = async (postItId: string, newStatus: string) => {
         updatePayload.movedBy = username;
         updatePayload.bugDescription = bugDescription;
     
-        await updateDoc(postItRef, updatePayload);
-        return;
     }
+    await updateDoc(postItRef, updatePayload);
+    return;
     };
 
 export default handleMovePostIt;
